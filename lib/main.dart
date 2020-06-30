@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:quizzler/question.dart';
+import 'package:quizzler/manager.dart';
+
+QuizManager manager = QuizManager();
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -26,14 +28,29 @@ class Quizzler extends StatefulWidget {
 class _QuizzlerState extends State<Quizzler> {
   List<Widget> score = [];
 
-  List<Question> questions = [
-    Question('question 0', false),
-    Question('question 1', true),
-    Question('question 2', true),
-    Question('question 3', false)
-  ];
-
-  int questionIndex = 0;
+  void handleAnswer(bool answer) {
+    setState(() {
+      if (manager.checkAnswer(answer)) {
+        score.add(
+          Expanded(
+            child: Icon(
+              Icons.check,
+              color: Colors.green,
+            ),
+          ),
+        );
+      } else {
+        score.add(
+          Expanded(
+            child: Icon(
+              Icons.clear,
+              color: Colors.red,
+            ),
+          ),
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +65,7 @@ class _QuizzlerState extends State<Quizzler> {
               padding: const EdgeInsets.all(8.0),
               child: Center(
                 child: Text(
-                  questions[questionIndex].question,
+                  manager.getNextQuestion(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 25.0,
@@ -72,28 +89,7 @@ class _QuizzlerState extends State<Quizzler> {
                   ),
                 ),
                 onPressed: () {
-                  setState(() {
-                    if (questions[questionIndex].answer == true) {
-                      score.add(
-                        Expanded(
-                          child: Icon(
-                            Icons.check,
-                            color: Colors.green,
-                          ),
-                        ),
-                      );
-                    } else {
-                      score.add(
-                        Expanded(
-                          child: Icon(
-                            Icons.clear,
-                            color: Colors.red,
-                          ),
-                        ),
-                      );
-                    }
-                    questionIndex = (questions.length + questionIndex + 1) % questions.length;
-                  });
+                  handleAnswer(true);
                 },
               ),
             ),
@@ -111,28 +107,7 @@ class _QuizzlerState extends State<Quizzler> {
                   ),
                 ),
                 onPressed: () {
-                  setState(() {
-                    if (questions[questionIndex].answer == false) {
-                      score.add(
-                        Expanded(
-                          child: Icon(
-                            Icons.check,
-                            color: Colors.green,
-                          ),
-                        ),
-                      );
-                    } else {
-                      score.add(
-                        Expanded(
-                          child: Icon(
-                            Icons.clear,
-                            color: Colors.red,
-                          ),
-                        ),
-                      );
-                    }
-                    questionIndex = (questions.length + questionIndex + 1) % questions.length;
-                  });
+                  handleAnswer(false);
                 },
               ),
             ),
